@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --input-color: rgba(91, 95, 106, 0.8);
+  --container-color: #3A3F4B;
+  --warm-coral: #FF7A59;
+}
+

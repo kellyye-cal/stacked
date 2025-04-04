@@ -3,17 +3,22 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const authRoutes = require('./routes/authRoutes')
 
 
-dotenv.config({path: '../.env'});
+dotenv.config();
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, "public")))
+// app.use(express.static(path.join(__dirname, "public")))
 
 app.use(express.json());
+
+app.use(bodyParser.json);
 
 app.use(cookieParser());
 
