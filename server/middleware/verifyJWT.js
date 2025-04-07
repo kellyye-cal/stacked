@@ -7,6 +7,7 @@ const verifyJWT = (req, res, next) => {
     }
     
     const authHeader = req.headers['authorization'];
+
     if (!authHeader) return res.sendStatus(401);
 
     const token = authHeader.split(' ')[1];
@@ -16,7 +17,8 @@ const verifyJWT = (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.sendStatus(403); //invalid token
-            req.id = decoded.id;
+            
+            req.userID = decoded.userID;
             next();
         }
     );
