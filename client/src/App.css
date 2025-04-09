@@ -11,15 +11,64 @@ body {
   font-size: 12pt;
 }
 
+.page {
+  margin: 32px 60px;
+}
+
+.content {
+  margin: 40px 0px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 400;
+}
+
+/* .nav-link:visited {
+  text-decoration: none;
+  color: #fff;
+} */
+
 h1 {
-  font-size: 32pt;
+  font-size: 28pt;
   margin: 4px 0px;
+}
+
+h2 {
+  font-size: 20pt;
+  margin: 8px 0px;
+
+}
+
+h3 {
+  font-size: 18pt;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 16pt;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: 14pt;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: 14pt;
+  font-weight: 500;
 }
 
 .h-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.bold {
+  font-weight: 700;
 }
 
 .body-large {
@@ -54,6 +103,8 @@ input::placeholder {
 }
 
 button {
+  background-color: transparent;
+  color: 3fff;
   border: 0;
   font-size: 12pt;
   padding: 4px 12px;
@@ -61,6 +112,8 @@ button {
 
   display: flex;
   align-items: center;
+
+  border-radius: 4px;
 }
 
 button:hover {
@@ -68,6 +121,11 @@ button:hover {
 }
 
 button.coral.square:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+button:disabled {
   cursor: default;
   opacity: 0.5;
 }
@@ -87,6 +145,20 @@ button.coral.square:disabled {
 
 .red-text {
   color: var(--red-text);
+}
+
+.vibrant-blue {
+  color: var(--vibrant-blue);
+}
+
+.vibrant-blue-bg {
+  background-color: var(--vibrant-blue);
+  color: #fff;
+}
+
+.subtle-gray-bg {
+  background-color: var(--subtle-gray);
+  color: #fff;
 }
 
 .auth-page {
@@ -163,4 +235,119 @@ button.coral.square:disabled {
 .invalid-input:focus{
   border: 1px solid var(--red-text);
   outline: none;
+}
+
+.card {
+  display: block;
+  background-color: var(--container-color);
+  padding: 12px 16px;
+  border-radius: 4px;
+  max-width: 300px;
+}
+
+.small.card {
+  max-width: 200px;
+}
+
+.group.card:hover > h4 {
+  text-decoration: underline;
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.profile-pic {
+  background-color: gray;
+  border-radius: 200px;
+}
+
+.profile-pic.med {
+  background-color: gray;
+  width: 32px;
+  height: 32px;
+}
+
+.profile-pic.large {
+  width: 60px;
+  height: 60px;
+}
+
+.dropdown {
+  width: 200px;
+  background-color: var(--container-color);
+
+  padding: 20px;
+
+  border-radius: 4px;
+}
+
+.container-shadow {
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 8px;
+
+}
+
+.dotted {
+  box-sizing: border-box;
+  border: dashed 2px var(--subtle-gray);
+}
+
+.circle {
+  border-radius: 200px;
+}
+
+.friend-card > .profile-pic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.friend-card {
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.friend-card > * {
+  text-align: center;
+}
+
+.modal {
+  background-color: var(--container-color);
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+
+  width: 400px;
+
+  border-radius: 8px;
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  opacity: 1;
+  transition: opacity 800ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: auto;
+}
+
+.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }

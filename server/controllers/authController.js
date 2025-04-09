@@ -8,11 +8,11 @@ const login = async(req, res) => {
     const phone = req.body.phoneNumber;
     try {
         
-        const verification = await twilioClient.verify
-        .v2
-        .services(process.env.TWILIO_VERIFY_SERVICE_SID)
-        .verifications
-        .create({to: `+1${phone}`, channel: "sms"});
+        // const verification = await twilioClient.verify
+        // .v2
+        // .services(process.env.TWILIO_VERIFY_SERVICE_SID)
+        // .verifications
+        // .create({to: `+1${phone}`, channel: "sms"});
 
         return res.status(200).json({next: "Verify"});
     } catch (err) {
@@ -25,14 +25,17 @@ const verifyCode = async(req, res) => {
     const {phone, code} = req.body;
 
     try {
-        // const verificationCheck = {
-        //     status: "approved"
-        // }
-        const verificationCheck = await twilioClient.verify
-        .v2
-        .services(process.env.TWILIO_VERIFY_SERVICE_SID)
-        .verificationChecks
-        .create({to: `+1${phone}`, code});
+        // FOR TESTING ONLY 
+        const verificationCheck = {
+            status: "approved"
+        }
+
+
+        // const verificationCheck = await twilioClient.verify
+        // .v2
+        // .services(process.env.TWILIO_VERIFY_SERVICE_SID)
+        // .verificationChecks
+        // .create({to: `+1${phone}`, code});
 
         if (verificationCheck.status === 'approved') {
             const user = await authService.findUserByPhone({phone});
@@ -40,7 +43,8 @@ const verifyCode = async(req, res) => {
             if (!user) {
                 return res.status(200).json({next: "Register"});
             } else {
-                const user = await authService.login({phoneNumber: phone})
+                const user = await authService.login({phoneNumber: phone});
+                res.cookie('jwt', user.refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
                 return res.status(200).json({next: "LoginExisting", user})
             }
         } else {
@@ -68,7 +72,6 @@ const register = async(req, res) => {
 }
 
 const logout = async(req, res) => {
-
     const cookies = req.cookies;
 
     if (!cookies?.jwt) { return res.status(204)}
@@ -86,9 +89,26 @@ const logout = async(req, res) => {
     res.sendStatus(204)
 }
 
+const refresh = async(req, res) => {
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.status(401);
+
+    const refreshToken = cookies.jwt;
+
+    try {
+        const accessToken = await authService.refreshAccessToken({refreshToken})
+        console.log(accessToken)
+        return res.json({accessToken})
+    } catch (error) {
+        res.status(500).json({message: "Error authenticating user", error})
+    }
+
+}
+
 module.exports = {
     login,
     verifyCode,
     register,
-    logout
+    logout,
+    refresh
 }

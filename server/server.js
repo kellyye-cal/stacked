@@ -9,7 +9,8 @@ const cors = require('cors');
 
 dotenv.config();
 
-const authRoutes = require('./routes/authRoutes')
+const authRoutes = require('./routes/authRoutes');
+const friendRoutes = require('./routes/friendRoutes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch(err => console.log('MongoDB connection error:', err));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/friends', friendRoutes);
 
 const port = process.env.PORT || 4000;
 

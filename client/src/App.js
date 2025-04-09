@@ -18,13 +18,15 @@ function App() {
     const storedAccessToken = sessionStorage.getItem('accessToken');
     const storedUserId = sessionStorage.getItem('userID');
     const storedName = sessionStorage.getItem('name');
+    const storedDisplayName = sessionStorage.getItem('displayName')
 
     if (storedAccessToken && storedUserId) {
         setAuth({
             accessToken: storedAccessToken,
-            userId: storedUserId,
+            userID: storedUserId,
             loggedOut: false,
-            name: storedName
+            name: storedName,
+            displayName: storedDisplayName
         });
     } else if (auth?.loggedOut || !auth?.accessToken) {
       return
@@ -33,35 +35,36 @@ function App() {
     }
   }, [setAuth]);
 
-  // useEffect(() => {
-  //   const refreshAccessToken = async () => {
-  //     if (auth?.loggedOut || !auth?.accessToken) {
-  //       return;
-  //     }
+  useEffect(() => {
+    const refreshAccessToken = async () => {
+      if (auth?.loggedOut || !auth?.accessToken) {
+        return;
+      }
+    
+      try {
+        const response = await apiClient.post('/api/auth/refresh', {}, {
+          withCredentials: true,
+        });
 
-  //     try {
-  //       const response = await axios.post('/api/auth/refresh', {}, {
-  //         withCredentials: true, // Send cookies with the request
-  //       });
+        console.log(response.data)
 
-  //       const newAccessToken = response.data.accessToken;
+        const newAccessToken = response.data.accessToken;
 
-  //       if (newAccessToken !== auth.accessToken) {
-  //         setAuth((prev) => ({ ...prev, accessToken: newAccessToken, loggedOut: false, admin: response.data.admin }));
-  //         // console.log("access token being refreshed", auth, newAccessToken)
+        if (newAccessToken !== auth.accessToken) {
+          setAuth((prev) => ({ ...prev, accessToken: newAccessToken, loggedOut: false}));
 
-  //         sessionStorage.setItem('accessToken', newAccessToken);
-  //       }
-  //     } catch (err) {
-  //       console.error("Error refreshing access token:", err);
-  //     }
-  //   }
+          sessionStorage.setItem('accessToken', newAccessToken);
+        }
+      } catch (err) {
+        console.error("Error refreshing access token:", err);
+      }
+    }
 
-  //   if (auth?.accessToken) {
-  //     refreshAccessToken();
-  //   }
+    if (auth?.accessToken) {
+      refreshAccessToken();
+    }
 
-  // }, [auth?.loggedOut, setAuth]);
+  }, [auth?.loggedOut, setAuth]);
 
   return (
       <BrowserRouter>

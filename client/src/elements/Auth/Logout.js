@@ -23,8 +23,9 @@ function Logout() {
                     sessionStorage.removeItem('accessToken');
                     sessionStorage.removeItem('userID');
                     sessionStorage.removeItem('name');
+                    sessionStorage.removeItem('displayName');
             
-                    setAuth({accessToken: null, userID: null, loggedOut: true, displayName: null})
+                    setAuth({accessToken: null, userID: null, loggedOut: true, displayName: null, name: null})
                     
                 }
 

@@ -71,9 +71,42 @@ const removeToken = async({id}) => {
     return;
 }
 
+const verifyToken = (token, secret) => {
+    return new Promise((resolve, reject) => {
+        jwt.verify(token, secret, (err, decoded) => {
+            if (err) return reject(err);
+            resolve(decoded)
+        })
+    })
+}
+
+const refreshAccessToken = async({refreshToken}) => {
+    const user = await User.findOne({ refreshToken });
+
+    if (!user) throw new Error("Forbidden");
+
+    try {
+        const decoded = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        if (user.userID != decoded.userID) {
+            throw new Error("Forbidden");
+        } else {
+            const accessToken = jwt.sign(
+                {userID: decoded.userID},
+                process.env.ACCESS_TOKEN_SECRET,
+                {expiresIn: "1h"}
+            );
+            return (accessToken);
+        }
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
+
 module.exports = {
     findUserByPhone,
     register,
     login,
-    removeToken
+    removeToken,
+
 }

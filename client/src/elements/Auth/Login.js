@@ -22,8 +22,9 @@ function Login() {
             sessionStorage.setItem('accessToken', accessToken);
             sessionStorage.setItem('userID', userID);
             sessionStorage.setItem('name', fName + ' ' + lName);
+            sessionStorage.setItem('displayName', displayName)
 
-            setAuth({accessToken, userID, loggedOut: false, displayName});
+            setAuth({accessToken, userID, loggedOut: false, displayName, name: fName + ' ' + lName});
         }
     }, [userInfo, setAuth])
 
