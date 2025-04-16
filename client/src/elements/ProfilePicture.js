@@ -1,11 +1,16 @@
-import React from "react";
+import React  from "react";
 
-function ProfilePicture({size}) {
-    return (
-        <div className={`profile-pic ${size}`}>
+function ProfilePicture({url, size}) {
 
-        </div>
-    )
+    return url ? (
+        <img
+            className={`profile-pic ${size}`}
+            src={url}
+            alt="Profile"
+        />
+    ) : (
+        <div className={`profile-pic ${size}`}></div>
+    );
 };
 
 export default ProfilePicture;

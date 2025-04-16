@@ -1,5 +1,6 @@
 const authService = require('../services/authService');
 const twilio = require('twilio');
+const cloudinary = require('../utils/cloudinary');
 
 const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 console.log(process.env.TWILIO_VERIFY_SERVICE_SID);
@@ -97,12 +98,24 @@ const refresh = async(req, res) => {
 
     try {
         const accessToken = await authService.refreshAccessToken({refreshToken})
-        console.log(accessToken)
         return res.json({accessToken})
     } catch (error) {
         res.status(500).json({message: "Error authenticating user", error})
     }
+}
 
+const updateProfilePicture = async(req, res) => {
+    const {userID} = req.body;
+    const file = req.file;
+
+    try {
+        const fileStr = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;   
+        const url = await authService.uploadProfilePicture({fileStr, userID});
+        return res.status(200).json({url});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: `Error uploading profile picture: ${err}`})
+    }
 }
 
 module.exports = {
@@ -110,5 +123,6 @@ module.exports = {
     verifyCode,
     register,
     logout,
-    refresh
+    refresh,
+    updateProfilePicture
 }

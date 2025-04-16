@@ -18,7 +18,8 @@ function App() {
     const storedAccessToken = sessionStorage.getItem('accessToken');
     const storedUserId = sessionStorage.getItem('userID');
     const storedName = sessionStorage.getItem('name');
-    const storedDisplayName = sessionStorage.getItem('displayName')
+    const storedDisplayName = sessionStorage.getItem('displayName');
+    const storedProfilePic = sessionStorage.getItem('profilePic');
 
     if (storedAccessToken && storedUserId) {
         setAuth({
@@ -26,7 +27,8 @@ function App() {
             userID: storedUserId,
             loggedOut: false,
             name: storedName,
-            displayName: storedDisplayName
+            displayName: storedDisplayName,
+            profilePic: storedProfilePic,
         });
     } else if (auth?.loggedOut || !auth?.accessToken) {
       return
@@ -45,8 +47,6 @@ function App() {
         const response = await apiClient.post('/api/auth/refresh', {}, {
           withCredentials: true,
         });
-
-        console.log(response.data)
 
         const newAccessToken = response.data.accessToken;
 

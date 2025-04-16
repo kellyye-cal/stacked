@@ -17,14 +17,14 @@ function Login() {
 
     useEffect(() => {
         if (userInfo.user) {
-            const {accessToken, userID, fName, lName, displayName} = userInfo.user;
-
+            const {accessToken, userID, fName, lName, displayName, profilePic} = userInfo.user;
             sessionStorage.setItem('accessToken', accessToken);
             sessionStorage.setItem('userID', userID);
             sessionStorage.setItem('name', fName + ' ' + lName);
-            sessionStorage.setItem('displayName', displayName)
+            sessionStorage.setItem('displayName', displayName);
+            sessionStorage.setItem('profilePic', profilePic);
 
-            setAuth({accessToken, userID, loggedOut: false, displayName, name: fName + ' ' + lName});
+            setAuth({profilePic, accessToken, userID, loggedOut: false, displayName, name: fName + ' ' + lName});
         }
     }, [userInfo, setAuth])
 

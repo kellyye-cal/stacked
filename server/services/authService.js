@@ -6,6 +6,8 @@ const {customAlphabet} = require('nanoid');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const nanoid = customAlphabet(alphabet, 6);
 
+const { cloudinary } = require('../utils/cloudinary');
+
 const findUserByPhone = async({phone}) => {
     const user = await User.findOne({phone});
 
@@ -37,7 +39,7 @@ const login = async({phoneNumber}) => {
     const existingUser = await User.findOne({ phone: phoneNumber });
     if (!existingUser) throw new Error("No user exists with this phone number.");
 
-    const {userID, phone, fName, lName, displayName} = existingUser;
+    const {userID, phone, fName, lName, displayName, profilePic} = existingUser;
 
     // var match = await bcrypt.compare(pwd, existingUser.pwd);
 
@@ -59,7 +61,7 @@ const login = async({phoneNumber}) => {
         {$set: {refreshToken: refreshToken}}
     );
 
-    return {user: {accessToken, userID, phone, fName, lName, displayName}, refreshToken}
+    return {user: {profilePic, accessToken, userID, phone, fName, lName, displayName}, refreshToken}
 }
 
 const removeToken = async({id}) => {
@@ -103,10 +105,28 @@ const refreshAccessToken = async({refreshToken}) => {
     }
 }
 
+const uploadProfilePicture = async({fileStr, userID}) => {
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+        folder: "profile_pictures",
+        transformation: [
+            { width: 300, height: 300, crop: "fill", gravity: "auto" }
+        ]
+    });
+    
+
+    await User.updateOne(
+        {userID},
+        {$set: {profilePic: uploadResponse.secure_url}}
+    );
+
+    return uploadResponse.secure_url;
+}
+
 module.exports = {
     findUserByPhone,
     register,
     login,
     removeToken,
-
+    refreshAccessToken,
+    uploadProfilePicture
 }

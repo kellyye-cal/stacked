@@ -63,9 +63,49 @@ const respondToFriendRequest = async(req, res) => {
     }
 }
 
+const createGroup = async(req, res) => {
+    const {user, groupName} = req.body;
+
+    try {
+        await friendService.createGroup({user, groupName});
+        return res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({message: `Error creating group: ${err}`})
+    }
+}
+
+const getMyGroups = async(req, res) => {
+    const {userID} = req.params;
+
+    try {
+        const groups = await friendService.getMyGroups({userID});
+        return res.status(200).json({groups});
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({message: `Error getting groups: ${err}`})
+    }
+}
+
+const getGroupByID = async(req, res) => {
+    const {groupID} = req.params;
+    
+    try {
+        const {groupData, members} = await friendService.getGroupByID({groupID});
+        return res.status(200).json({members, groupData});
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({message: `Error getting group: ${err}`})
+    }
+
+}
+
 module.exports = {
     addFriend,
     getFriends,
     getUserByID,
-    respondToFriendRequest
+    respondToFriendRequest,
+    createGroup,
+    getMyGroups,
+    getGroupByID
 }

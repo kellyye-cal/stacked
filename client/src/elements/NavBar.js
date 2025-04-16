@@ -1,8 +1,9 @@
 import React, {useRef, useContext, useState} from 'react';
 import Logo from './Logo';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import Dropdown from './Dropdown';
 import AuthContext from '../context/AuthProvider';
+import ProfilePicture from './ProfilePicture';
 
 function NavBar({userID}) {
     const {auth, setAuth} = useContext(AuthContext);
@@ -20,12 +21,17 @@ function NavBar({userID}) {
                 <NavLink className="nav-link" to='/home'> Home </NavLink>
                 
                 <div >
-                    <button ref={buttonRef} onClick={toggleMenu} className='profile-pic med'>
-
+                    <button ref={buttonRef} onClick={toggleMenu}>
+                        <ProfilePicture size={"med"} url={auth.profilePic} />
                     </button>
 
                     <Dropdown isOpen={open} closeFunc={close} buttonRef={buttonRef}>
-                        <p> {auth.userID} </p>
+                        <p className="subtle"> {auth.userID} </p>
+
+                        <div className='dropdown-settings'>
+                            <Link to="/settings"> Settings </Link>
+                            <Link to="/logout"> Logout </Link>
+                        </div>
                     </Dropdown>
                 </div>
 

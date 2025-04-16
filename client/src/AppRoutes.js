@@ -5,6 +5,8 @@ import AuthContext from './context/AuthProvider';
 import Login from "./elements/Auth/Login"
 import Home from './elements/Home/Home'
 import Logout from './elements/Auth/Logout';
+import Group from './elements/Groups/Group';
+import Settings from './elements/Settings';
 
 function AppRoutes() {
     useAxiosInterceptors();
@@ -76,6 +78,25 @@ function AppRoutes() {
                     <Navigate to="/login" />
                    )
                    }
+            />
+
+            <Route path="/groups/:groupID" 
+                element={auth.accessToken ? (
+                    <ProtectedRoute>
+                        <Group display={"Page"}/>
+                    </ProtectedRoute>
+                    ) : (
+                        <Navigate to="/login" />
+            )}/>
+
+            <Route path="/settings" 
+                element={auth.accessToken ? (
+                    <ProtectedRoute>
+                        <Settings />
+                    </ProtectedRoute>
+                ) : (
+                    <Navigate to="/login" />
+                )}
             />
 
             <Route path="/login" element={auth.accessToken ? <Navigate to={`/home`} /> : <Login />} />

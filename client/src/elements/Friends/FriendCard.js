@@ -68,7 +68,7 @@ function FriendCard({friendID, status, setUpdateFriends}) {
     } else {
         return (
             <div className="friend-card">
-                <ProfilePicture size={"large"}/>
+                <ProfilePicture size={"large"} url={friendInfo.profilePic}/>
                 <div>
                     <p className="body-large bold"> {friendInfo.displayName} </p>
                     <p className="subtle small-label"> <FontAwesomeIcon icon={faUsers} size="xs"/> No mutual groups. </p>
