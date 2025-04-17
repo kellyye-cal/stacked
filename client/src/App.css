@@ -419,3 +419,16 @@ a {
 .profile-overlay:hover {
   opacity: 1;
 }
+
+.group-card-members {
+  display: flex;
+  margin: 4px 0px;
+}
+
+.group-card-members > * {
+  margin-left: -6px;
+}
+
+.group-card-members > *:first-child {
+  margin-left: 0;
+}

@@ -87,6 +87,18 @@ const getMyGroups = async(req, res) => {
     }
 }
 
+const getMyGroupInvites = async(req, res) => {
+    const {userID} = req.params;
+
+    try {
+        const invites = await friendService.getMyGroupInvites({userID});
+        return res.status(200).json({invites})
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({message: `Error getting my group invites: ${err}`})
+    }
+}
+
 const getGroupByID = async(req, res) => {
     const {groupID} = req.params;
     
@@ -95,9 +107,68 @@ const getGroupByID = async(req, res) => {
         return res.status(200).json({members, groupData});
     } catch (err) {
         console.error(err);
-        return res.status(500).json({message: `Error getting group: ${err}`})
+        return res.status(500).json({message: `Error getting group: ${err}`});
     }
 
+}
+
+const inviteFriendToGroup = async(req, res) => {
+    const {groupID, invitingUser, invitedUser} = req.body;
+
+    try {
+        const status = await friendService.inviteFriendToGroup({groupID, invitingUser, invitedUser});
+        return res.status(200).json({status});
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({message: `Error inviting friend to group: ${err}`})
+    }
+}
+
+const respondToGroupInvite = async(req, res) => {
+    const {userID, groupID, response} = req.body;
+
+    try {
+        if (response === 'Accept') {
+            const response = await friendService.acceptGroupInvite({userID, groupID});
+            return res.status(200).json({response})
+        } else if (response === 'Reject') {
+            const response = await friendService.rejectGroupInvite({userID, groupID});
+            return res.status(200).json({response})
+        }
+    } catch (err) {
+        return res.status(500).json({message: `Error responding to group invite: ${err}`})
+    }
+}
+
+const requestGroup = async(req, res) => {
+    const {userID, groupID} = req.body;
+
+    try {
+        const response = await friendService.requestGroup({userID, groupID});
+        return res.status(200).json({response});
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({message: `Error requesting group`});
+    }
+}
+
+const respondToJoinRequest = async (req, res) => {
+    const {userID, groupID, memberID, response} = req.body;
+
+    try {
+        if (response === "Accept") {
+            const response = await friendService.acceptJoinRequest({userID, groupID, memberID});
+            return res.status(200).json({response})
+        } else if (response === "Reject") {
+            const response = await friendService.rejectJoinRequest({userID, groupID, memberID});
+            return res.status(200).json({response})
+        }
+
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({message: `Error responding to join request: ${err}`});
+
+    }
 }
 
 module.exports = {
@@ -107,5 +178,10 @@ module.exports = {
     respondToFriendRequest,
     createGroup,
     getMyGroups,
-    getGroupByID
+    getGroupByID,
+    inviteFriendToGroup,
+    getMyGroupInvites,
+    respondToGroupInvite,
+    requestGroup,
+    respondToJoinRequest
 }

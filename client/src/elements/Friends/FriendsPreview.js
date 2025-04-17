@@ -59,7 +59,7 @@ function FriendsPreview() {
             <div style={{display: "flex", gap: 24}}>
                 <AddFriend />
                 {friends.map((friendID) => (
-                    <FriendCard friendID={friendID} status={"Accepted"} />
+                    <FriendCard key={friendID} friendID={friendID} status={"Accepted"} />
                 ))}
             </div>
         </div>

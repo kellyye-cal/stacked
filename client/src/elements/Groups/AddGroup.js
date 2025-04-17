@@ -23,7 +23,6 @@ function AddGroup() {
     const [groupInviteCode, setGroupInviteCode] = useState("");
     const [validInviteCode, setValidInviteCode] = useState(false);
     const [requestErr, setRequestErr] = useState(0);
-    const [requestSent, setRequestSent] = useState();
 
     useEffect(() => {
         setValidInviteCode(CODE_REGEX.test(groupInviteCode));
@@ -31,6 +30,24 @@ function AddGroup() {
 
     const handleJoinRequest = (e) => {
         e.preventDefault();
+        
+        apiClient.post('/api/friends/request_join',
+            {userID: auth.userID, groupID: groupInviteCode},
+            {headers: {Authorization: `Bearer ${auth?.accessToken}`}, withCredentials: true}
+        ).then((res) => {
+            if (res.data.response === "Success") {
+                setSubmittedDisplay("Request sent!")
+                setSubmitted(true);
+
+                setTimeout(() => {
+                    closeModal();
+                    setGroupInviteCode("");
+                    setRequestErr("");
+                }, 600)
+            } else {
+                setRequestErr(res.data.response);
+            }
+        }).catch((err) => {console.error(err)})
     }
 
     const [newGroupName, setNewGroupName] = useState("");
@@ -91,7 +108,7 @@ function AddGroup() {
                                         id="code"
                                         onChange={(e) => {
                                             setGroupInviteCode(e.target.value.toUpperCase().replace(/[^A-Za-z0-9]/g, ''));
-            
+                                            setRequestErr("")
                                         }}
                                         value={groupInviteCode}
                                         required
@@ -113,8 +130,7 @@ function AddGroup() {
                                         Send Request 
                                     </button>
                                 </div>
-                                {requestErr === 404 ? <p className="red-text small-text" style={{marginTop: 4}}> No group found with that code. </p> : <></>}
-                                {requestErr === 422 ? <p className="red-text small-text" style={{marginTop: 4}}> You've already sent this group a join request. </p> : <></>}
+                                {requestErr ? <p className="small-label red-text"> {requestErr} </p> : <></>}
                             </div>
 
 

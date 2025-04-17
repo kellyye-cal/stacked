@@ -1,14 +1,18 @@
 import React from "react";
 import ProfilePicture from "../ProfilePicture";
 
-function MemberCard({member}) {
+function MemberCard({member, pending}) {
     return (
         <div className="friend-card">
             <ProfilePicture size="large" url={member.profilePic} />
+
+            <div>
             <p className="body-large bold"> 
                 <span className="subtle"> #1 </span>
                 {member.displayName} 
             </p>
+            {pending ? <p className="small-label subtle" style={{marginTop: 0}}> Pending </p> : <></>}
+            </div>
         </div>
     )
 }

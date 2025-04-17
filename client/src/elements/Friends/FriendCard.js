@@ -4,6 +4,7 @@ import AuthContext from "../../context/AuthProvider";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faCheck } from '@fortawesome/free-solid-svg-icons';
 import ProfilePicture from "../ProfilePicture";
+import RequestCard from "../RequestCard";
 
 function FriendCard({friendID, status, setUpdateFriends}) {
     const {auth} = useContext(AuthContext);
@@ -44,26 +45,10 @@ function FriendCard({friendID, status, setUpdateFriends}) {
                     Response sent!
                 </div>)
                 :
-                (<div className="small card">
+                (<RequestCard buttonOneFunc={() => respond("Accept")} buttonTwoFunc={()=>respond("Reject")}>
                     <h6> {friendInfo.displayName} </h6>
                     <p className="subtle"> {friendInfo.fName + ' ' + friendInfo.lName} </p>
-
-                    <div className="h-between" style={{gap: 12, margin: "8px auto"}}>
-                        <button
-                            style={{flex: 1, padding: "6px 0px", textAlign: "center", justifyContent: "center", gap: 5, fontSize: "11pt"}}
-                            className="vibrant-blue-bg"
-                            onClick={() => respond("Accept")}>
-                            <FontAwesomeIcon icon={faCheck} size="xs"/> Accept
-                        </button>
-
-                        <button
-                            style={{flex: 1, padding: "6px 0px", textAlign: "center", justifyContent: "center", fontSize: "11pt"}} 
-                            className="subtle-gray-bg"
-                            onClick={() => respond("Reject")}>
-                            Reject
-                        </button>
-                    </div>
-                </div>)
+                </RequestCard>)
         )
     } else {
         return (

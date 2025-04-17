@@ -13,7 +13,6 @@ const memberSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ["Invited", "Requested", "Member"],
-        default: 'Pending',
     }
 })
 
