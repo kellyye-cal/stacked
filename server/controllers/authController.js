@@ -7,7 +7,19 @@ console.log(process.env.TWILIO_VERIFY_SERVICE_SID);
 
 const login = async(req, res) => {
     const phone = req.body.phoneNumber;
+
     try {
+        if (process.env.NODE_ENV === "development" && phone.startsWith("202555")) {
+            const user = await authService.findUserByPhone({phone});
+
+            if (!user) {
+                return res.status(200).json({next: "Register"});
+            } else {
+                const user = await authService.login({phoneNumber: phone});
+                res.cookie('jwt', user.refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
+                return res.status(200).json({next: "LoginExisting", user})
+            }
+        }
         
         // const verification = await twilioClient.verify
         // .v2
@@ -97,9 +109,15 @@ const refresh = async(req, res) => {
     const refreshToken = cookies.jwt;
 
     try {
-        const accessToken = await authService.refreshAccessToken({refreshToken})
-        return res.json({accessToken})
+        const tokens = await authService.refreshAccessToken({refreshToken})
+        console.log(tokens)
+        if (tokens.refreshToken) {
+            res.cookie('jwt', tokens.refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
+        }   
+
+        return res.json({accessToken: tokens.accessToken})
     } catch (error) {
+        console.error(error)
         res.status(500).json({message: "Error authenticating user", error})
     }
 }

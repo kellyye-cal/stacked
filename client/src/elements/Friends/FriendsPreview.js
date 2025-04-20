@@ -23,12 +23,12 @@ function FriendsPreview() {
 
             for (let i = 0; i < res.data.length; i++) {
                 if (res.data[i].status === 'Pending' && res.data[i].userB === auth.userID) {
-                    pendingList.push(res.data[i].userA)
+                    pendingList.push(res.data[i])
                 } else if (res.data[i].status === "Accepted") {
                     if (res.data[i].userA === auth.userID) {
-                        friendsList.push(res.data[i].userB)
+                        friendsList.push(res.data[i])
                     } else {
-                        friendsList.push(res.data[i].userA)
+                        friendsList.push(res.data[i])
                     }
                 }
             }
@@ -42,15 +42,24 @@ function FriendsPreview() {
     }, [updateFriends])
 
     return (
-        <div>
+        <div style={{margin: "20px 0px"}}>
             <h2> Friends </h2>
+
+            {friends.length === 0 && (
+                <p className="body-large" style={{marginBottom: 20}}>
+                    It’s a little lonely here :(
+                        <br/>
+                    <span className="vibrant-blue medium-font"> Add some friends </span>
+                    to start playing! 
+                </p>
+            )}
 
             {pending.length > 0 ?
                 <div>
                     <h3 style={{marginBottom: 4}}> Pending Requests </h3>
                     <div>
-                        {pending.map((friendID) => (
-                            <FriendCard friendID={friendID} status={"Pending"} setUpdateFriends={setUpdateFriends}/>
+                        {pending.map((friend) => (
+                            <FriendCard key={friend.userA} friend={friend} status={"Pending"} setUpdateFriends={setUpdateFriends}/>
                         ))}
                     </div>
                 </div>
@@ -58,8 +67,8 @@ function FriendsPreview() {
                     
             <div style={{display: "flex", gap: 24}}>
                 <AddFriend />
-                {friends.map((friendID) => (
-                    <FriendCard key={friendID} friendID={friendID} status={"Accepted"} />
+                {friends.map((friend) => (
+                    <FriendCard key={friend.userA} friend={friend} status={"Accepted"} />
                 ))}
             </div>
         </div>

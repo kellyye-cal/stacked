@@ -11,6 +11,8 @@ dotenv.config();
 
 const authRoutes = require('./routes/authRoutes');
 const friendRoutes = require('./routes/friendRoutes');
+const gameRoutes = require('./routes/gameRoutes');
+
 
 const app = express();
 
@@ -36,6 +38,8 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 app.use('/api/auth', authRoutes);
 app.use('/api/friends', friendRoutes);
+app.use('/api/games', gameRoutes);
+
 
 const port = process.env.PORT || 4000;
 

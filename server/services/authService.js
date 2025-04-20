@@ -87,25 +87,57 @@ const refreshAccessToken = async({refreshToken}) => {
 
     if (!user) throw new Error("Forbidden");
 
-    try {
-        const decoded = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    let decoded;
 
-        if (user.userID != decoded.userID) {
-            throw new Error("Forbidden");
-        } else {
-            const accessToken = jwt.sign(
-                {userID: decoded.userID},
-                process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn: "1h"}
-            );
-            return (accessToken);
-        }
+    try {
+     decoded = await verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
     } catch (error) {
         throw new Error(error.message)
     }
+
+    if (user.userID != decoded.userID) throw new Error("Forbidden");
+
+    const now = Math.floor(Date.now() / 1000);
+    const timeLeft = decoded.exp - now;
+    const THRESHOLD = 60 * 60; 
+
+    let newRefreshToken = null;
+
+    if (timeLeft < THRESHOLD) {
+        newRefreshToken = await generateRefreshToken({userID: decoded.userID});
+        user.refreshToken = newRefreshToken;
+        await user.save();
+    }
+    const accessToken = jwt.sign(
+        {userID: decoded.userID},
+        process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn: "1h"}
+    );
+
+    return {accessToken, refreshToken: newRefreshToken};
+}
+
+const generateRefreshToken = async({userID}) => {
+    const refreshToken = jwt.sign(
+        {userID},
+        process.env.REFRESH_TOKEN_SECRET,
+        {expiresIn: '7d'}
+    );
+
+    return refreshToken;
 }
 
 const uploadProfilePicture = async({fileStr, userID}) => {
+    const user = await User.findOne({userID});
+
+    if (user?.profilePicID) {
+        try {
+            await cloudinary.uploader.destroy(user.profilePicID)
+        } catch (err) {
+            throw new Error(err);
+        }
+    }
+
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
         folder: "profile_pictures",
         transformation: [
@@ -116,11 +148,15 @@ const uploadProfilePicture = async({fileStr, userID}) => {
 
     await User.updateOne(
         {userID},
-        {$set: {profilePic: uploadResponse.secure_url}}
+        {$set: {
+            profilePic: uploadResponse.secure_url,
+            profilePicID: uploadResponse.public_id
+        }}
     );
 
     return uploadResponse.secure_url;
 }
+
 
 module.exports = {
     findUserByPhone,
@@ -128,5 +164,6 @@ module.exports = {
     login,
     removeToken,
     refreshAccessToken,
+    generateRefreshToken,
     uploadProfilePicture
 }

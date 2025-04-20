@@ -57,6 +57,7 @@ h5 {
 }
 
 h6 {
+  text-transform: uppercase;
   font-size: 14pt;
   font-weight: 500;
 }
@@ -65,6 +66,10 @@ h6 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.medium-font {
+  font-weight: 500;
 }
 
 .bold {
@@ -154,6 +159,10 @@ button:disabled {
 
 .coral-text {
   color: var(--warm-coral)
+}
+
+.green-text {
+  color: var(--green);
 }
 
 .red-text {
@@ -255,6 +264,7 @@ button:disabled {
   background-color: var(--container-color);
   padding: 12px 16px;
   border-radius: 4px;
+  box-sizing: border-box;
   max-width: 300px;
 }
 
@@ -308,7 +318,6 @@ a {
 
 .container-shadow {
   box-shadow: rgba(0, 0, 0, 0.1) 0 4px 8px;
-
 }
 
 .dotted {
@@ -431,4 +440,181 @@ a {
 
 .group-card-members > *:first-child {
   margin-left: 0;
+}
+
+.group-card-members.large > * {
+  margin-left: -16px;
+}
+
+.group-card-members.large > *:first-child {
+  margin-left: 0;
+}
+
+.chip {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: green;
+}
+
+.chip > div {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: conic-gradient(
+    white 0deg 25deg,
+    transparent 25deg 60deg,
+    white 60deg 85deg,
+    transparent 85deg 120deg,
+    white 120deg 145deg,
+    transparent 145deg 180deg,
+    white 180deg 205deg,
+    transparent 205deg 240deg,
+    white 240deg 265deg,
+    transparent 265deg 300deg,
+    white 300deg 325deg,
+    transparent 325deg 360deg
+  );
+}
+
+.game.card {
+  width: 320px;
+  height: 160px;
+  color: var(--vibrant-blue);
+}
+
+.game.card.dotted {
+  background-color: transparent;
+  box-sizing: border-box;
+  border: dashed 2px var(--vibrant-blue);
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.chip-amount {
+  align-items: center;
+}
+
+
+.chip-amount > div > * {
+  width: 40px;
+  font-size: 11pt;
+  padding: 2px 4px;
+  margin-top: 4px;
+}
+
+.add-chip-button:disabled {
+  cursor: default;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hover-display {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hover-display:hover {
+  opacity: 1;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+}
+
+.spinner {
+  animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+}
+
+.section {
+  margin: 20px 0px;
+}
+
+.game.card.container {
+  overflow: hidden;
+  color: #fff;
+
+}
+
+.earnings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.earnings-table th,
+.earnings-table td {
+  text-align: left;
+  padding: 8px 4px;
+  border-bottom: 1px solid #fff;
+}
+
+/* .earnings-table > thead > tr {
+  display: flex;
+  justify-content: space-between;
+  height: 30px;
+  border-bottom: 1px solid #fff;
+}
+
+.earnings-table > thead > th {
+  padding: 0;
+  text-align: left;
+}
+
+.earnings-table > tbody > tr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #fff;
+  height: 40px;
+} */
+
+.rank-col {
+  width: 42px;
+}
+
+.player-col {
+  width: 140px;
+}
+
+.winnings-col {
+  width: 89px;
+}
+
+.invest-col {
+  width: 89px;
+}
+
+
+.cashout-col {
+  width: 89px;
+}
+
+.buyin-col {
+  width: 90px;
+}
+
+.game.settings > div > label {
+  font-size: 14pt;
+  font-weight: 500;
+}
+
+.game.card.container:hover > div > h4 {
+  text-decoration: underline;
 }

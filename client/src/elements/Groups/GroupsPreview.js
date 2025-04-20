@@ -45,11 +45,15 @@ function GroupsPreview() {
     }
 
     return (
-        <div>
+        <div style={{margin: "8px 0px 20px 0px"}}>
             <div className="h-between">
                 <h2> Your Groups</h2>
                 <AddGroup />
             </div>
+
+            {groups.length === 0 && (
+                <p className="body-large">No groups yet, <span className="vibrant-blue medium-font">add or create one!</span></p>
+            )}
             
             <div>
                 {groups.map((group, index) => (

@@ -6,11 +6,19 @@ import { faUsers, faCheck } from '@fortawesome/free-solid-svg-icons';
 import ProfilePicture from "../ProfilePicture";
 import RequestCard from "../RequestCard";
 
-function FriendCard({friendID, status, setUpdateFriends}) {
+function FriendCard({friend, status, setUpdateFriends}) {
     const {auth} = useContext(AuthContext);
     const [friendInfo, setFriendInfo] = useState([]);
     
     const [responded, setResponded] = useState(false);
+
+    const [friendID, setFriendID] = useState(friend.userA);
+
+    useEffect(() => {
+        if (friend.userA === auth.userID) {
+            setFriendID(friend.userB);
+        }
+    }, [auth.userID, friend])
 
     useEffect(() => {
         apiClient.get(
@@ -20,7 +28,8 @@ function FriendCard({friendID, status, setUpdateFriends}) {
         ).then((res) => {
             setFriendInfo(res.data.friend);
         }).catch((err) => {console.error(err)})
-    }, [friendID]);
+    }, [auth.accessToken, auth.userID, friend.userA, friend.userB]);
+
 
     const respond = (response) => {
         setResponded(true);
@@ -46,7 +55,10 @@ function FriendCard({friendID, status, setUpdateFriends}) {
                 </div>)
                 :
                 (<RequestCard buttonOneFunc={() => respond("Accept")} buttonTwoFunc={()=>respond("Reject")}>
-                    <h6> {friendInfo.displayName} </h6>
+                    <div style={{display: "flex", gap: 4, alignItems: "center"}}>
+                        <ProfilePicture url={friendInfo.profilePic} size="small" />
+                        <h6> {friendInfo.displayName} </h6>
+                    </div>
                     <p className="subtle"> {friendInfo.fName + ' ' + friendInfo.lName} </p>
                 </RequestCard>)
         )
@@ -56,7 +68,10 @@ function FriendCard({friendID, status, setUpdateFriends}) {
                 <ProfilePicture size={"large"} url={friendInfo.profilePic}/>
                 <div>
                     <p className="body-large bold"> {friendInfo.displayName} </p>
-                    <p className="subtle small-label"> <FontAwesomeIcon icon={faUsers} size="xs"/> No mutual groups. </p>
+                    <p className="subtle small-label">
+                        <FontAwesomeIcon icon={faUsers} size="xs" style={{marginRight: 4}}/>
+                        {friend.mutualGroups.join(", ")}
+                    </p>
                 </div>
 
             </div>

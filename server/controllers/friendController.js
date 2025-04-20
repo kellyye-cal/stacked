@@ -103,8 +103,8 @@ const getGroupByID = async(req, res) => {
     const {groupID} = req.params;
     
     try {
-        const {groupData, members} = await friendService.getGroupByID({groupID});
-        return res.status(200).json({members, groupData});
+        const {groupData, members, games} = await friendService.getGroupByID({groupID});
+        return res.status(200).json({members, groupData, games});
     } catch (err) {
         console.error(err);
         return res.status(500).json({message: `Error getting group: ${err}`});
@@ -167,7 +167,29 @@ const respondToJoinRequest = async (req, res) => {
     } catch (err) {
         console.error(err)
         return res.status(500).json({message: `Error responding to join request: ${err}`});
+    }
+}
 
+const getLeaderboard = async(req, res) => {
+    const {groupID} = req.params;
+
+    try {
+        const leaderboard = await friendService.getLeaderboard({groupID});
+        return res.status(200).json(leaderboard);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({message: `Error getting leaderboard: ${err}`});
+    }
+}
+
+const getMyRank = async(req, res) => {
+    const {userID, groupID} = req.body;
+
+    try {
+        const {rank, netEarnings} = await friendService.getMyRank({groupID, userID});
+        return res.status(200).json({rank, netEarnings});
+    } catch (err) {
+        return res.status(500).json({message: `Error getting group rank: ${err}`});
     }
 }
 
@@ -183,5 +205,7 @@ module.exports = {
     getMyGroupInvites,
     respondToGroupInvite,
     requestGroup,
-    respondToJoinRequest
+    respondToJoinRequest,
+    getLeaderboard,
+    getMyRank
 }

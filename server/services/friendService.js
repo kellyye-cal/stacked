@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const Group = require('../models/groupModel');
 const GroupActivity = require('../models/groupActivityModel');
 const Member = require('../models/memberModel');
+const Game = require('../models/gameModel')
 
 const {customAlphabet} = require('nanoid');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -13,8 +14,16 @@ const addFriend = async({sender, recipient}) => {
 
     if (!user) {return 404}
 
-    const friendship = await Friend.findOne({userA: sender, userB: recipient});
-    if (friendship) {return 422}
+    const existingFriendship = await Friend.findOne({
+        $or: [
+            { userA: sender, userB: recipient },
+            { userA: recipient, userB: sender }
+        ]
+    });
+    
+    if (existingFriendship) {
+        return 422;
+    }
 
     const newFriendship = new Friend({
         userA: sender,
@@ -34,11 +43,37 @@ const getTopFriends = async({userID, limit}) => {
         ]
     }).limit(parseInt(limit));
 
-    return friends;
+    const myGroups = ((await getMyGroups({userID})).map(group => group.groupID));
+    
+    const friendsWithMutuals = await Promise.all(friends.map(async (friendship) => {
+        let friendID = friendship.userA === userID ? friendship.userB : friendship.userA;
+        const groups = await getMyGroups({ userID: friendID });
+
+        const mutualGroups = groups
+            .filter(group => myGroups.includes(group.groupID))
+            .map(group => group.name);
+
+        const friendObj = friendship.toObject();
+        friendObj.mutualGroups = mutualGroups;
+
+        return friendObj;
+    }));
+
+    return friendsWithMutuals;
 }
 
 const getUserByID = async({userID}) => {
-    const friend = await User.findOne({userID});
+    const {friendID, phone, fName, lName, displayName, profilePic} = await User.findOne({userID});
+
+    const friend = {
+        userID: friendID,
+        phone, 
+        fName, 
+        lName, 
+        displayName, 
+        profilePic
+    }
+
     return friend;
 }
 
@@ -177,8 +212,9 @@ const getMembersOfGroup = async({groupID}) => {
 const getGroupByID = async({groupID}) => {
     const groupData = await Group.findOne({groupID});
     const members = await getMembersOfGroup({groupID});
+    const games = await Game.find({groupID})
 
-    return {groupData, members}
+    return {groupData, members, games}
 }
 
 const inviteFriendToGroup = async ({groupID, invitingUser, invitedUser}) => {
@@ -249,7 +285,6 @@ const rejectGroupInvite = async({userID, groupID}) => {
     } else if (invite.role === "Invited") {
         await Member.deleteOne({userID, groupID});
         const allMembers = await Member.find({});
-        console.log(allMembers)
         
         return "Success"
     }
@@ -351,6 +386,54 @@ const rejectJoinRequest = async({userID, groupID, memberID}) => {
     return "Error"
 }
 
+const getLeaderboard = async({groupID}) => {
+    const allGames = await Game.find({groupID});
+    const members = await getMembersOfGroup({groupID});
+
+    const leaderboard = {}
+
+    members.forEach((member) => {
+        if (member.role === 'Member') {
+            leaderboard[member.userID] = {
+                userID: member.userID,
+                displayName: member.displayName,
+                profilePic: member.profilePic,
+                netInvestment: 0,
+                netEarnings: 0,
+                biggestLoss: 0, 
+                gamesPlayed: 0,
+            };
+        }
+    });
+
+    allGames.forEach((game) => {
+        for (const [playerID, investment] of game.investment.entries()) {
+            if (game.status === 'End') {
+                let winningsForThisGame = game.earnings.get(playerID) + investment;
+
+                leaderboard[playerID].netInvestment += investment;
+                leaderboard[playerID].netEarnings += winningsForThisGame;
+    
+                leaderboard[playerID].biggestLoss = Math.min(leaderboard[playerID].biggestLoss, winningsForThisGame)
+                leaderboard[playerID].gamesPlayed += 1;
+            }
+    }})
+
+    return leaderboard;
+}
+
+const getMyRank = async({groupID, userID}) => {
+    const groupLeaderboard = await getLeaderboard({groupID});
+
+    const sortedLeaderboard = (Object.values(groupLeaderboard).sort((a, b) => b.netEarnings - a.netEarnings));
+
+    const rank = sortedLeaderboard.findIndex(player => player.userID === userID) + 1
+
+    const netEarnings = groupLeaderboard[userID].netEarnings;
+
+    return {rank, netEarnings};
+}
+
 module.exports = {
     addFriend,
     getTopFriends,
@@ -367,5 +450,7 @@ module.exports = {
     rejectGroupInvite,
     requestGroup,
     acceptJoinRequest,
-    rejectJoinRequest
+    rejectJoinRequest,
+    getLeaderboard,
+    getMyRank
 }

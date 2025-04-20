@@ -13,6 +13,15 @@ const memberSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ["Invited", "Requested", "Member"],
+    },
+    netEarnings: {
+        type: Number,
+        default: 0
+    },
+    lastSyncedGameID: {
+        type: String,
+        required: false,
+        default: ""
     }
 })
 

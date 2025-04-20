@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema({
     }, profilePic: {
         type: String,
         default: ''
+    },  profilePicID: {
+        type: String,
+        default: ''
     },
     refreshToken: {
         type: String

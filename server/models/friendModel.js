@@ -23,12 +23,5 @@ const friendSchema = new mongoose.Schema({
 
 friendSchema.index({ userA: 1, userB: 1 }, { unique: true });
 
-friendSchema.pre('save', function (next) {
-    if (this.userA > this.userB) {
-        [this.userA, this.userB] = [this.userB, this.userA];
-    }
-    next();
-});
-
 const Friend = mongoose.model('Friend', friendSchema);
 module.exports = Friend;

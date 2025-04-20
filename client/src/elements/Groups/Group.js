@@ -8,6 +8,10 @@ import AuthContext from "../../context/AuthProvider";
 import InviteMember from "./InviteMember";
 import ProfilePicture from "../ProfilePicture";
 import RequestCard from "../RequestCard";
+import CreateGame from "../Games/CreateGame";
+import GameCard from "../Games/GameCard";
+import Leaderboard from "../Friends/Leaderboard";
+import { formatCurrency } from "../../utils";
 
 function Group({display, data}) {
     const {auth} = useContext(AuthContext);
@@ -15,10 +19,15 @@ function Group({display, data}) {
 
     const [groupData, setGroupData] = useState([]);
     const [members, setMembers] = useState([]);
+    const [games, setGames] = useState([]);
+    const [leaderboardData, setLeaderboardData] = useState([])
 
     const [showPending, setShowPending] = useState(false);
 
     const [requests, setRequests] = useState([]);
+
+    const [rank, setRank] = useState(0);
+    const [netEarnings, setMyNetEarnings] = useState(0);
 
     const fetchGroupData = async () => {
         apiClient.get(`/api/friends/get_group_by_id/${groupID}`,
@@ -26,6 +35,7 @@ function Group({display, data}) {
         ).then((res) => {
             setGroupData(res.data.groupData);
             setMembers(res.data.members);
+            setGames(res.data.games)
 
             let req = []
 
@@ -37,11 +47,28 @@ function Group({display, data}) {
 
             setRequests(req);
         }).catch((err) => {console.error(err)})
+    
+        apiClient.get(`/api/friends/get_leaderboard/${groupID}`,
+            {headers: {Authorization: `Bearer ${auth?.accessToken}`}, withCredentials: true}
+        ).then((res) => {
+            setLeaderboardData(Object.values(res.data).sort((a, b) => b.netEarnings - a.netEarnings));
+        }).catch((err) => {console.error(err)})
     }
 
     useEffect(() => {
         fetchGroupData();
-    }, [groupID, auth.accessToken]);
+
+        if (data?.groupID) {
+            apiClient.post('/api/friends/my_rank',
+                {groupID: data.groupID, userID: auth.userID},
+                {headers: {Authorization: `Bearer ${auth?.accessToken}`}, withCredentials: true}
+            ).then((res) => {
+                setMyNetEarnings(res.data.netEarnings);
+                setRank(res.data.rank);
+            }).catch((err) => {console.error(err)})
+        }
+    }, [groupID, auth.accessToken, data?.groupID]);
+
 
     const [responseErr, setResponseErr] = useState("")
 
@@ -72,10 +99,10 @@ function Group({display, data}) {
                     ))}
                 </div>
                 
-                <div style={{display: "flex", gap: 8}}>
-                    <p> Ranked #7/8 </p>
+                <div className="medium-font" style={{display: "flex", gap: 8}}>
+                    <p> Ranked #{rank}<span className="subtle">/{data.members.length}</span></p>
                     <p> | </p>
-                    <p> -%50.42 </p>
+                    <p className={`${netEarnings <= 0 ? "red-text" : "green-text"}`}> {formatCurrency(netEarnings)} </p>
                 </div>
             </Link>
         )
@@ -115,25 +142,44 @@ function Group({display, data}) {
                         </div>
                         <div style={{display: "flex", gap: 4}}>
                             <InviteMember groupID={groupID}/>
-                            {members.map((member, id) => (
-                                (member.role === "Invited" && showPending ? 
-                                    <MemberCard pending={true} member={member} key={id} />
-
+                            {members
+                                .map((member) => ({
+                                    ...member,
+                                    rank: leaderboardData.findIndex(player => player.userID === member.userID) + 1
+                                }))
+                                .sort((a, b) => a.rank - b.rank)
+                                .map((member, id) => (
+                                    member.role === "Invited" && showPending ? 
+                                        <MemberCard pending={true} member={member} key={id} />
                                     : member.role === "Member" ?
-                                    <MemberCard pending={false} member={member} key={id} />
+                                        <MemberCard 
+                                            pending={false} 
+                                            member={member} 
+                                            key={id} 
+                                            rank={member.rank}/>
                                     : <></>
-                                )
-                            
-                            ))}
+                                ))
+                            }
                         </div>
                     </div>
 
                     <div>
                         <h2> Leaderboard </h2>
+                        <Leaderboard data={leaderboardData}/>
                     </div>
 
                     <div>
                         <h2> Games </h2>
+                        <div style={{display: "grid", 
+                                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                                    columnGap: "min(20px, 8px)",
+                                    rowGap: "12px",
+                                    width: "100%"}}>
+                            <CreateGame groupID={groupID}/>
+                            {games.map((game) => (
+                                <GameCard game={game} />
+                            ))}
+                        </div>
                     </div>
                 </div>
 
